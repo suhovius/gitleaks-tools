@@ -6,7 +6,7 @@ REPO_URL="https://github.com/gitleaks/gitleaks"
 : ${USE_SUDO:="true"}
 : ${GITLEAKS_INSTALL_DIR:="/usr/local/bin"}
 
-# Current available releases at 2024.08.25
+# Releases formating example
 # gitleaks_8.18.4_darwin_arm64.tar.gz
 # gitleaks_8.18.4_darwin_x64.tar.gz
 # gitleaks_8.18.4_linux_arm64.tar.gz
