@@ -6,7 +6,7 @@ REPO_URL="https://github.com/gitleaks/gitleaks"
 : ${USE_SUDO:="true"}
 : ${GITLEAKS_INSTALL_DIR:="/usr/local/bin"}
 
-# Releases formating example
+# Releases formating example:
 # gitleaks_8.18.4_darwin_arm64.tar.gz
 # gitleaks_8.18.4_darwin_x64.tar.gz
 # gitleaks_8.18.4_linux_arm64.tar.gz
@@ -140,7 +140,7 @@ downloadFile() {
   # gitleaks_8.18.4_linux_armv6.tar.gz
   GITLEAKS_DIST="gitleaks_${TAG:1}_${OS}_${ARCH}"
   DOWNLOAD_URL="$REPO_URL/releases/download/$TAG/$GITLEAKS_DIST.tar.gz"
-  GITLEAKS_TMP_ROOT="$(mktemp -dt gitleaks-binary)"
+  GITLEAKS_TMP_ROOT="$(mktemp -dt gitleaks-binary-XXXXXX)"
   GITLEAKS_TMP_ARCHIVE_FILE="$GITLEAKS_TMP_ROOT/$GITLEAKS_DIST.tar.gz"
   if type "curl" > /dev/null; then
     scurl -sL "$DOWNLOAD_URL" -o "$GITLEAKS_TMP_ARCHIVE_FILE"
