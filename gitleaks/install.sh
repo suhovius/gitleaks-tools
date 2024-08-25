@@ -98,7 +98,7 @@ verifySupported() {
 # if it needs to be changed.
 checkGitleaksInstalledVersion() {
   if [[ -f "${GITLEAKS_INSTALL_DIR}/${APP_NAME}" ]]; then
-    local version=$(gitleaks version | grep 'gitleaks version' | cut -d " " -f3)
+    local version=$(gitleaks version)
     if [[ "$version" == "$TAG" ]]; then
       echo "gitleaks ${version} is already ${DESIRED_VERSION:-latest}"
       return 0
