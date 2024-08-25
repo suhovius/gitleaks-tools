@@ -138,10 +138,21 @@ checkLatestVersion() {
 downloadFile() {
   # Dist example:
   # gitleaks_8.18.4_linux_armv6.tar.gz
+  # gitleaks_8.18.4_windows_x64.zip
+
+  case "$OS" in
+    linux | darwin)
+      ARCHIVE_EXTENSION="tar.gz"
+      ;;
+    windows)
+      ARCHIVE_EXTENSION="zip"
+      ;;
+  esac
+
   GITLEAKS_DIST="gitleaks_${TAG:1}_${OS}_${ARCH}"
-  DOWNLOAD_URL="$REPO_URL/releases/download/$TAG/$GITLEAKS_DIST.tar.gz"
+  DOWNLOAD_URL="$REPO_URL/releases/download/$TAG/$GITLEAKS_DIST.${ARCHIVE_EXTENSION}"
   GITLEAKS_TMP_ROOT="$(mktemp -dt gitleaks-binary-XXXXXX)"
-  GITLEAKS_TMP_ARCHIVE_FILE="$GITLEAKS_TMP_ROOT/$GITLEAKS_DIST.tar.gz"
+  GITLEAKS_TMP_ARCHIVE_FILE="$GITLEAKS_TMP_ROOT/$GITLEAKS_DIST.${ARCHIVE_EXTENSION}"
   if type "curl" > /dev/null; then
     scurl -sL "$DOWNLOAD_URL" -o "$GITLEAKS_TMP_ARCHIVE_FILE"
   elif type "wget" > /dev/null; then
