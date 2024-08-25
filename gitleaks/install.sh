@@ -40,7 +40,7 @@ initOS() {
 
   case "$OS" in
     # Minimalist GNU for Windows
-    mingw*) 
+    mingw* | cygwin* | msys* | Windows_NT)
       OS="windows"
       USE_SUDO="false"
       if [[ ! -d "$GITLEAKS_INSTALL_DIR" ]]; then
@@ -82,8 +82,8 @@ scurl() {
 # binary builds.
 verifySupported() {
   local supported="darwin_arm64\ndarwin_x64\nlinux_arm64\nlinux_armv6\nlinux_armv7\nlinux_x32\nlinux_x64\nwindows_armv6\nwindows_armv7\nwindows_x32\nwindows_x64"
-  if ! echo "${supported}" | grep -q "${OS}-${ARCH}"; then
-    echo "No prebuilt binary for ${OS}-${ARCH}."
+  if ! echo "${supported}" | grep -q "${OS}_${ARCH}"; then
+    echo "No prebuilt binary for ${OS}_${ARCH}."
     echo "To build from source, go to $REPO_URL"
     exit 1
   fi
@@ -138,15 +138,29 @@ checkLatestVersion() {
 downloadFile() {
   # Dist example:
   # gitleaks_8.18.4_linux_armv6.tar.gz
-  GITLEAKS_DIST="gitleaks_${TAG:1}_$OS_$ARCH"
+  GITLEAKS_DIST="gitleaks_${TAG:1}_${OS}_${ARCH}"
   DOWNLOAD_URL="$REPO_URL/releases/download/$TAG/$GITLEAKS_DIST.tar.gz"
-  GITLEAKS_TMP_ROOT="$(mktemp -dt gitleaks-binary-XXXXXX)"
-  GITLEAKS_TMP_FILE="$GITLEAKS_TMP_ROOT/$GITLEAKS_DIST"
+  GITLEAKS_TMP_ROOT="$(mktemp -dt gitleaks-binary)"
+  GITLEAKS_TMP_ARCHIVE_FILE="$GITLEAKS_TMP_ROOT/$GITLEAKS_DIST.tar.gz"
   if type "curl" > /dev/null; then
-    scurl -sL "$DOWNLOAD_URL" -o "$GITLEAKS_TMP_FILE"
+    scurl -sL "$DOWNLOAD_URL" -o "$GITLEAKS_TMP_ARCHIVE_FILE"
   elif type "wget" > /dev/null; then
-    wget -q -O "$GITLEAKS_TMP_FILE" "$DOWNLOAD_URL"
+    wget -q -O "$GITLEAKS_TMP_ARCHIVE_FILE" "$DOWNLOAD_URL"
   fi
+}
+
+# Extract the archive based on the OS
+extractFile() {
+  GITLEAKS_TMP_FILE="$GITLEAKS_TMP_ROOT/$APP_NAME"
+  case "$OS" in
+    linux | darwin)
+      tar -xzf $GITLEAKS_TMP_ARCHIVE_FILE -C $GITLEAKS_TMP_ROOT
+      ;;
+    windows)
+      GITLEAKS_TMP_FILE="$GITLEAKS_TMP_FILE.exe"
+      unzip $GITLEAKS_TMP_ARCHIVE_FILE -d $GITLEAKS_TMP_ROOT
+      ;;
+  esac
 }
 
 # installFile verifies the SHA256 for the file, then unpacks and
@@ -228,6 +242,7 @@ verifySupported
 checkTagProvided || checkLatestVersion
 if ! checkGitleaksInstalledVersion; then
   downloadFile
+  extractFile
   installFile
 fi
 testVersion
