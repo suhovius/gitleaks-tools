@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
 checkIfPreCommitExists() {
-	if file .git/hooks/pre-commit &> /dev/null; then
+	if [ -f .git/hooks/pre-commit ]; then
 		echo "WARNING! .git/hooks/pre-commit file alerady exists!"
 		read -p "Override?? (Y/N): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
+
 		downloadAndInstallPreCommitGitHook
 	else
 		downloadAndInstallPreCommitGitHook
