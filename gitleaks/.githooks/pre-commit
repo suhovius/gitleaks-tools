@@ -1,0 +1,50 @@
+#!/bin/sh
+
+ensureGitleaksInstalled() {
+  # Check if gitleaks is installed
+  if ! type "gitleaks" > /dev/null; then
+    echo "gitleaks not found. Installing gitleaks..."
+    curl -s https://raw.githubusercontent.com/suhovius/scripts/main/gitleaks/install.sh | bash
+
+    if ! type "gitleaks" > /dev/null; then
+      echo "Failed to install gitleaks. Aborting commit."
+      exit 1
+    fi
+  fi  
+}
+
+runGitleaksCheck() {
+  # Run gitleaks protect on the staged changes
+  gitleaks protect --verbose --redact --staged
+
+  # Capture the exit status of gitleaks
+  status=$?
+
+  if [ $status -ne 0 ]; then
+    echo "gitleaks detected sensitive information. Please review and resolve."
+    exit 1
+  fi
+
+  echo "gitleaks check passed."
+}
+
+gitleaksCheck() {
+  local gitleaks_enabled=$1
+  if [ ! -z $gitleaks_enabled ] && [ $gitleaks_enabled == "true" ]; then
+    ensureGitleaksInstalled
+    runGitleaksCheck
+  else
+    echo "hooks.gitleaks is not set, skipping gitleaks check."
+  fi    
+}
+
+# Enable the gitleaks hook with git config hooks.gitleaks true
+gitleaksCheck $(git config --get --bool hooks.gitleaks)
+
+# INFO: Any additional hooks can be added here keeping the same style to call exit on failure only
+# to let all the possible hooks being called.
+
+echo "All pre-commit checks passed."
+
+# Exit with success if no any hooks are enabled or no any of them have failed
+exit 0
