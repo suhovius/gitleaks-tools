@@ -23,6 +23,7 @@ REPO_URL="https://github.com/gitleaks/gitleaks"
 initArch() {
   ARCH=$(uname -m)
   case $ARCH in
+    armv5*) ARCH="armv5";; # Not available at current gitleaks releases. But added for future compatibility
     armv6*) ARCH="armv6";;
     armv7*) ARCH="armv7";;
     arm64) ARCH="arm64";;
