@@ -2,7 +2,7 @@
 
 checkIfPreCommitExists() {
 	if [ -f .git/hooks/pre-commit ]; then
-		echo "WARNING! .git/hooks/pre-commit file alerady exists!"
+		echo "WARNING! .git/hooks/pre-commit file already exists!"
 		read -p "Override? (Y/N): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
 		echo "Overriding the existing .git/hooks/pre-commit file"
 		downloadAndInstallPreCommitGitHook
