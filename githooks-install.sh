@@ -35,4 +35,6 @@ downloadAndInstallPreCommitGitHook() {
 }
 
 ensureGitleaksInstalled
+printf "\n"
 checkIfPreCommitExists
+printf "\n"

@@ -1,26 +1,28 @@
 ### Git Hooks Intallation
 
-`.githooks` folder contains githooks files for the `gitleaks` comand. In order to use it at yours project, you need to copy it to yours project directory. 
+Enter yours project directory with already initialized git repository. Copy this command and run in yours terminal.
 
-Make ensure that `.githooks` files are executable:
+`bash <(curl -Ls https://raw.githubusercontent.com/suhovius/gitleaks-tools/main/githooks-install.sh)`
 
-`find .githooks -type f -exec chmod +x {} \;`
+We have to use [process substitution](https://askubuntu.com/questions/423101/access-terminal-stdin-when-its-the-source-of-the-bash-script-itself) ([read docs here](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Process-Substitution)) in order to let the user input (stdin) work; as script might ask permission to override the existing `.git/hooks/pre-commit` file
 
-#### Setup
+Example call when `gitleaks` is not installed in the system and project contains existing `pre-commit` git hook file:
 
-Read more here [https://www.viget.com/articles/two-ways-to-share-git-hooks-with-your-team/](https://www.viget.com/articles/two-ways-to-share-git-hooks-with-your-team/)
+```bash
+bash <(curl -Ls https://raw.githubusercontent.com/suhovius/gitleaks-tools/main/githooks-install.sh)
+gitleaks not found. Installing gitleaks...
+Preparing to install gitleaks into /usr/local/bin
+gitleaks installed into /usr/local/bin/gitleaks
+Run 'gitleaks --help' to see what you can do with it.
 
-Choose githooks installation method
+WARNING! .git/hooks/pre-commit file already exists!
+Override? (Y/N): Yes
+Overriding the existing .git/hooks/pre-commit file
+Downloading and installing .git/hooks/pre-commit file
+Making .git/hooks/pre-commit file executable
+```
 
-If you're using Git version 2.9 or greater, assign the `core.hooksPath` configuration variable to managed hooks directory:
-
-`$ git config core.hooksPath .githooks`
-
-If you're using an earlier version, you need to ensure that your managed hooks make it into the `.git/hooks` directory. Symlink `.githooks` to `.git/hooks`, just make sure to clear the old ones out first:
-
-`$ find .git/hooks -type l -exec rm {} \; && find .githooks -type f -exec ln -sf ../../{} .git/hooks/ \;`
-
-#### Enable/Disable
+### Enable/Disable
 
 Use git config option `hooks.gitleaks` to switch on/off gitleaks check 
 
@@ -36,7 +38,9 @@ Or unset this config parameter completely if you do not need it anymore
 
 `git config --unset-all --bool hooks.gitleaks`
 
-### Gitleaks Installation (Can be installed automatically via .githooks/pre-commit)
+### Separate Gitleaks Installation (Can be installed automatically via .githooks/pre-commit)
+
+You can use these calls to install the gitleaks only without any pre commit hooks.
 
 ```bash
 # Install script (latest release):
