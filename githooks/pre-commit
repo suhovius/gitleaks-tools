@@ -13,7 +13,7 @@ ensureGitleaksInstalled() {
   fi  
 }
 
-runGitleaksCheck() {
+runGitleaksProtectCheck() {
   # Run gitleaks protect on the staged changes
   gitleaks protect --verbose --redact --staged
 
@@ -21,25 +21,55 @@ runGitleaksCheck() {
   status=$?
 
   if [ $status -ne 0 ]; then
-    echo "gitleaks protect detected sensitive information. Please review and resolve."
+    echo "gitleaks protect found sensitive information. Please review and resolve."
     exit 1
   fi
 
-  echo "gitleaks check passed."
+  echo "gitleaks protect check passed."
 }
 
-gitleaksCheck() {
-  local gitleaks_enabled=$1
-  if [ ! -z $gitleaks_enabled ] && [ $gitleaks_enabled == "true" ]; then
+gitleaksProtectCheck() {
+  local check_enabled=$(git config --get --bool hooks.gitleaks.protect)
+  if [ ! -z $check_enabled ] && [ $check_enabled == "true" ]; then
     ensureGitleaksInstalled
-    runGitleaksCheck
+    runGitleaksProtectCheck
   else
-    echo "hooks.gitleaks is not set, skipping gitleaks check."
+    echo "hooks.gitleaks.protect is not set, skipping gitleaks check."
   fi    
 }
 
-# Enable the gitleaks hook with git config hooks.gitleaks true
-gitleaksCheck $(git config --get --bool hooks.gitleaks)
+runGitleaksDetectCheck() {
+  # Run gitleaks detect on the commited changes
+  gitleaks detect --verbose --redact
+
+  # Capture the exit status of gitleaks
+  status=$?
+
+  if [ $status -ne 0 ]; then
+    echo "gitleaks detect found sensitive information. Please review and resolve."
+    exit 1
+  fi
+
+  echo "gitleaks detect check passed."
+}
+
+gitleaksDetectCheck() {
+  local check_enabled=$(git config --get --bool hooks.gitleaks.detect)
+  if [ ! -z $check_enabled ] && [ $check_enabled == "true" ]; then
+    ensureGitleaksInstalled
+    runGitleaksDetectCheck
+  else
+    echo "hooks.gitleaks.detect is not set, skipping gitleaks check."
+  fi
+}
+
+# Enable the gitleaks protect hook with git config hooks.gitleaks.protect true
+# Run gitleaks protect on the staged changes
+gitleaksProtectCheck
+
+# Enable the gitleaks detect hook with git config hooks.gitleaks.detect true
+# Run gitleaks detect on the commited changes
+gitleaksDetectCheck
 
 # INFO: Any additional hooks can be added here keeping the same style to call exit on failure only
 # to let all the possible hooks being called.
