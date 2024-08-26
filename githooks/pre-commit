@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ensureGitleaksInstalled() {
   # Check if gitleaks is installed
