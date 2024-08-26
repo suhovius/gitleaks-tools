@@ -2,7 +2,7 @@
 
 ensureGitleaksInstalled() {
   # Check if gitleaks is installed
-  if ! type "gitleaks" > /dev/null; then
+  if ! [ -x "$(command -v gitleaks)" ]; then
     echo "gitleaks not found. Installing gitleaks..."
     curl -s https://raw.githubusercontent.com/suhovius/gitleaks-tools/main/install.sh | bash
 
